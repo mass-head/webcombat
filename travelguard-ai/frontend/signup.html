@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Create a TravelGuard AI account with a username and password." />
+  <title>Sign Up — TravelGuard AI</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/responsive.css" />
+</head>
+<body data-guest-only>
+  <a class="skip-link" href="#main">Skip to main content</a>
+  <header class="site-header">
+    <nav class="nav" aria-label="Main navigation">
+      <a class="logo" href="index.html" aria-label="TravelGuard AI home"><span>TravelGuard <strong>AI</strong></span></a>
+      <button class="nav-toggle" id="nav-toggle" type="button" aria-expanded="false" aria-controls="nav-links" aria-label="Open menu"><span></span><span></span><span></span></button>
+      <div class="nav-links" id="nav-links">
+        <a href="index.html#home">Home</a>
+        <a href="index.html#features">Features</a>
+        <a href="login.html">Login</a>
+        <a class="btn btn-primary btn-sm" href="signup.html" aria-current="page">Sign Up</a>
+      </div>
+    </nav>
+  </header>
+
+  <main id="main" class="container page-narrow">
+    <section class="form-card" aria-labelledby="signup-heading">
+      <h1 id="signup-heading">Create your account</h1>
+      <p class="form-intro">Usernames only — no email, phone, or social login required.</p>
+      <div class="alert alert-error" id="form-error" role="alert" hidden></div>
+      <div class="alert alert-success" id="form-success" role="status" hidden></div>
+      <form id="signup-form" novalidate>
+        <div class="field">
+          <label for="username">Username</label>
+          <input type="text" id="username" name="username" autocomplete="username" required minlength="3" maxlength="32" placeholder="e.g. alex_travels" />
+          <p class="form-hint">3–32 characters: letters, numbers, dot, underscore, or hyphen.</p>
+        </div>
+        <div class="field">
+          <label for="password">Password</label>
+          <div class="password-wrap">
+            <input type="password" id="password" name="password" autocomplete="new-password" required minlength="8" placeholder="At least 8 characters" />
+            <button type="button" class="toggle-visibility" data-target="password" aria-label="Show password" aria-pressed="false">Show</button>
+          </div>
+          <p class="form-hint">Minimum 8 characters.</p>
+        </div>
+        <div class="field">
+          <label for="confirm-password">Confirm password</label>
+          <div class="password-wrap">
+            <input type="password" id="confirm-password" name="confirmPassword" autocomplete="new-password" required placeholder="Repeat your password" />
+            <button type="button" class="toggle-visibility" data-target="confirm-password" aria-label="Show password" aria-pressed="false">Show</button>
+          </div>
+        </div>
+        <button class="btn btn-primary btn-block" type="submit" id="signup-submit">Create Account</button>
+      </form>
+      <p class="form-switch">Already have an account? <a href="login.html">Log in</a></p>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-grid">
+      <div class="footer-brand"><span class="logo-static">TravelGuard <strong>AI</strong></span></div>
+      <nav aria-label="Footer navigation"><ul class="footer-links"><li><a href="about.html">About</a></li><li><a href="privacy.html">Privacy</a></li><li><a href="contact.html">Contact</a></li></ul></nav>
+    </div>
+    <p class="copyright">&copy; <span id="year">2026</span> TravelGuard AI. All rights reserved.</p>
+  </footer>
+
+  <script src="js/main.js"></script>
+  <script src="js/auth.js"></script>
+</body>
+</html>

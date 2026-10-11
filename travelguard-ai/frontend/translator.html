@@ -1,0 +1,262 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TravelGuard AI — AI Language Translator</title>
+  <meta name="description" content="AI Language Translator for international travelers with phonetic pronunciation, speech audio playback, and essential travel phrasebook.">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/dashboard.css">
+  <link rel="stylesheet" href="css/responsive.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to main content</a>
+
+  <!-- Navigation -->
+  <header class="site-header">
+    <nav class="nav" aria-label="Main navigation">
+      <a class="logo" href="dashboard.html" aria-label="TravelGuard AI home"><span>TravelGuard <strong>AI</strong></span></a>
+      <button class="nav-toggle" id="nav-toggle" type="button" aria-expanded="false" aria-controls="nav-links" aria-label="Open menu"><span></span><span></span><span></span></button>
+      <div class="nav-links" id="nav-links">
+        <a href="dashboard.html">Dashboard</a>
+        <a href="assistant.html">Assistant</a>
+        <a href="emergency.html">Emergency</a>
+        <a href="routes.html">Routes</a>
+        <a href="translator.html" aria-current="page">Translator</a>
+        <button class="btn btn-ghost btn-sm" type="button" data-logout>Logout</button>
+      </div>
+    </nav>
+  </header>
+
+  <main id="main" class="container page">
+    <!-- Header Section -->
+    <section class="welcome-section reveal" style="margin-bottom: 2rem;">
+      <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
+        <div>
+          <h1 style="margin: 0 0 0.4rem; font-size: clamp(1.8rem, 3.5vw, 2.4rem);">🌐 AI Language Translator</h1>
+          <p class="welcome-subtitle" style="margin: 0;">Instant multi-lingual translation with phonetic pronunciation guides and travel phrase shortcuts.</p>
+        </div>
+        <div style="display: flex; align-items: center; gap: 0.5rem; background: #ffffff; padding: 0.4rem 0.8rem; border-radius: var(--radius-full); border: 1px solid var(--color-border); box-shadow: var(--shadow-sm);">
+          <span class="status-dot online" style="background: var(--c-forest); box-shadow: 0 0 8px rgba(40, 89, 67, 0.5);"></span>
+          <span style="font-size: 0.85rem; font-weight: 600; color: var(--color-text);">AI Speech & Translation Engine Online</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Main Translator Grid -->
+    <section class="reveal" style="margin-bottom: 2.5rem;">
+      <div style="display: grid; grid-template-columns: 1fr auto 1fr; gap: 1.25rem; align-items: start;" id="translator-grid">
+        
+        <!-- Source Box -->
+        <div class="card" style="padding: 1.5rem; background: #ffffff; border: 1px solid var(--color-border); border-radius: var(--radius-lg); box-shadow: var(--shadow-sm);">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem; border-bottom: 1px solid var(--color-border); padding-bottom: 0.6rem;">
+            <label for="source-lang-select" style="font-weight: 700; font-size: 0.92rem; color: var(--color-text);">Source Language</label>
+            <select id="source-lang-select" class="form-input" style="width: auto; padding: 0.35rem 0.75rem; font-size: 0.88rem; font-weight: 600; border-radius: var(--radius-md);">
+              <option value="auto">🌐 Auto Detect</option>
+              <option value="en" selected>English</option>
+              <option value="es">Spanish (Español)</option>
+              <option value="fr">French (Français)</option>
+              <option value="de">German (Deutsch)</option>
+              <option value="hi">Hindi (हिन्दी)</option>
+              <option value="ja">Japanese (日本語)</option>
+              <option value="zh">Chinese (中文)</option>
+              <option value="it">Italian (Italiano)</option>
+              <option value="ar">Arabic (العربية)</option>
+              <option value="pt">Portuguese (Português)</option>
+              <option value="ru">Russian (Русский)</option>
+              <option value="ko">Korean (한국어)</option>
+              <option value="nl">Dutch (Nederlands)</option>
+              <option value="tr">Turkish (Türkçe)</option>
+              <option value="th">Thai (ไทย)</option>
+              <option value="vi">Vietnamese (Tiếng Việt)</option>
+            </select>
+          </div>
+
+          <div style="position: relative;">
+            <textarea
+              id="source-text"
+              class="form-input"
+              rows="6"
+              placeholder="Type or paste text to translate... (e.g. 'Where is the nearest hospital and how do I get there?')"
+              style="width: 100%; resize: vertical; font-size: 1.02rem; line-height: 1.6; border: 1px solid var(--color-border); border-radius: var(--radius-md); padding: 0.85rem;"
+              maxlength="1000"
+            ></textarea>
+            <button type="button" id="clear-source-btn" title="Clear text" style="position: absolute; top: 8px; right: 8px; background: transparent; border: none; cursor: pointer; color: var(--color-text-muted); font-size: 1.1rem; padding: 4px;" hidden>✕</button>
+          </div>
+
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 0.75rem;">
+            <span id="char-counter" style="font-size: 0.8rem; color: var(--color-text-muted);">0 / 1000</span>
+            <div style="display: flex; gap: 0.5rem;">
+              <button type="button" class="btn btn-ghost btn-sm" id="mic-btn" title="Voice Input (Speech-to-Text)">
+                🎤 Voice Input
+              </button>
+              <button type="button" class="btn btn-primary btn-sm" id="translate-btn" style="min-width: 110px;">
+                Translate ➔
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Language Swap Button -->
+        <div style="display: flex; align-items: center; justify-content: center; height: 100%; padding-top: 5rem;">
+          <button type="button" class="btn btn-ghost" id="swap-lang-btn" title="Swap languages" style="width: 44px; height: 44px; padding: 0; border-radius: 50%; font-size: 1.25rem; background: var(--c-cream); border: 1px solid var(--c-gold); color: var(--color-primary); box-shadow: var(--shadow-sm);">
+            ⇄
+          </button>
+        </div>
+
+        <!-- Target Box -->
+        <div class="card" style="padding: 1.5rem; background: #ffffff; border: 1px solid var(--color-border); border-radius: var(--radius-lg); box-shadow: var(--shadow-sm);">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem; border-bottom: 1px solid var(--color-border); padding-bottom: 0.6rem;">
+            <label for="target-lang-select" style="font-weight: 700; font-size: 0.92rem; color: var(--color-text);">Target Language</label>
+            <select id="target-lang-select" class="form-input" style="width: auto; padding: 0.35rem 0.75rem; font-size: 0.88rem; font-weight: 600; border-radius: var(--radius-md);">
+              <option value="es" selected>Spanish (Español)</option>
+              <option value="fr">French (Français)</option>
+              <option value="de">German (Deutsch)</option>
+              <option value="hi">Hindi (हिन्दी)</option>
+              <option value="ja">Japanese (日本語)</option>
+              <option value="zh">Chinese (中文)</option>
+              <option value="it">Italian (Italiano)</option>
+              <option value="ar">Arabic (العربية)</option>
+              <option value="pt">Portuguese (Português)</option>
+              <option value="ru">Russian (Русский)</option>
+              <option value="ko">Korean (한국어)</option>
+              <option value="nl">Dutch (Nederlands)</option>
+              <option value="tr">Turkish (Türkçe)</option>
+              <option value="th">Thai (ไทย)</option>
+              <option value="vi">Vietnamese (Tiếng Việt)</option>
+              <option value="en">English</option>
+            </select>
+          </div>
+
+          <div id="target-output-container" style="min-height: 140px; background: var(--c-cream); border: 1px solid rgba(40, 89, 67, 0.15); border-radius: var(--radius-md); padding: 1rem; position: relative;">
+            <div id="target-placeholder" style="color: var(--color-text-muted); font-style: italic;">
+              Translation will appear here with pronunciation and cultural advice...
+            </div>
+            <div id="target-content" hidden>
+              <div id="translated-text" style="font-size: 1.25rem; font-weight: 700; color: var(--color-text); line-height: 1.5; margin-bottom: 0.75rem;"></div>
+              
+              <!-- Phonetic Pronunciation Pill -->
+              <div id="pronunciation-box" style="margin-bottom: 0.75rem; padding: 0.5rem 0.85rem; background: #ffffff; border: 1px solid var(--c-gold); border-radius: var(--radius-md); display: flex; align-items: center; gap: 0.5rem;" hidden>
+                <span style="font-size: 0.85rem; font-weight: 700; color: var(--color-primary);">🗣️ Pronunciation:</span>
+                <span id="pronunciation-text" style="font-size: 0.95rem; font-weight: 600; color: var(--color-secondary);"></span>
+              </div>
+
+              <!-- Cultural / Travel Tip -->
+              <div id="travel-tip-box" style="padding: 0.5rem 0.85rem; background: rgba(40, 89, 67, 0.08); border-left: 3px solid var(--color-secondary); border-radius: 4px; font-size: 0.85rem; color: var(--color-text); margin-bottom: 0.5rem;" hidden>
+                <strong>💡 Travel Tip:</strong> <span id="travel-tip-text"></span>
+              </div>
+            </div>
+
+            <!-- Loading Spinner -->
+            <div id="translation-loading" style="display: none; align-items: center; justify-content: center; height: 120px;">
+              <div class="spinner"></div>
+            </div>
+          </div>
+
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 0.75rem;">
+            <span id="detected-lang-pill" style="font-size: 0.8rem; font-weight: 600; color: var(--color-secondary);"></span>
+            <div style="display: flex; gap: 0.5rem;">
+              <button type="button" class="btn btn-ghost btn-sm" id="speak-btn" title="Listen to pronunciation">
+                🔊 Listen
+              </button>
+              <button type="button" class="btn btn-ghost btn-sm" id="copy-btn" title="Copy translated text">
+                📋 Copy
+              </button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Essential Traveler Phrasebook -->
+    <section class="reveal" style="margin-bottom: 3rem;">
+      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.25rem;">
+        <div>
+          <h2 class="section-title" style="margin: 0 0 0.3rem;">📖 Instant Travel Phrasebook</h2>
+          <p class="section-subtitle" style="margin: 0;">Click any common phrase to immediately translate and pronounce it in your chosen language.</p>
+        </div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.25rem;">
+        
+        <!-- Emergency Category -->
+        <div class="card" style="padding: 1.25rem; border: 1px solid var(--color-border); border-radius: var(--radius-lg); background: #ffffff;">
+          <h3 style="font-size: 1.05rem; display: flex; align-items: center; gap: 0.5rem; margin-top: 0; color: #c53030;">
+            <span>🚨</span> Emergency & Medical
+          </h3>
+          <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+            <button type="button" class="phrase-chip btn btn-ghost btn-sm" data-phrase="Where is the nearest hospital?">Where is the nearest hospital?</button>
+            <button type="button" class="phrase-chip btn btn-ghost btn-sm" data-phrase="I need urgent medical help!">I need urgent medical help!</button>
+            <button type="button" class="phrase-chip btn btn-ghost btn-sm" data-phrase="Please call the police immediately!">Please call the police immediately!</button>
+            <button type="button" class="phrase-chip btn btn-ghost btn-sm" data-phrase="I lost my passport and wallet.">I lost my passport and wallet.</button>
+            <button type="button" class="phrase-chip btn btn-ghost btn-sm" data-phrase="I am allergic to penicillin and nuts.">I am allergic to penicillin and nuts.</button>
+          </div>
+        </div>
+
+        <!-- Transit Category -->
+        <div class="card" style="padding: 1.25rem; border: 1px solid var(--color-border); border-radius: var(--radius-lg); background: #ffffff;">
+          <h3 style="font-size: 1.05rem; display: flex; align-items: center; gap: 0.5rem; margin-top: 0; color: var(--color-primary);">
+            <span>🚕</span> Transit & Directions
+          </h3>
+          <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+            <button type="button" class="phrase-chip btn btn-ghost btn-sm" data-phrase="Where is the train station?">Where is the train station?</button>
+            <button type="button" class="phrase-chip btn btn-ghost btn-sm" data-phrase="How much does a ride to the airport cost?">How much to the airport?</button>
+            <button type="button" class="phrase-chip btn btn-ghost btn-sm" data-phrase="Please take me to this address.">Please take me to this address.</button>
+            <button type="button" class="phrase-chip btn btn-ghost btn-sm" data-phrase="Where can I rent a car or bike?">Where can I rent a car or bike?</button>
+            <button type="button" class="phrase-chip btn btn-ghost btn-sm" data-phrase="Does this subway line go to the center?">Does this go to the city center?</button>
+          </div>
+        </div>
+
+        <!-- Hotel & Accommodation -->
+        <div class="card" style="padding: 1.25rem; border: 1px solid var(--color-border); border-radius: var(--radius-lg); background: #ffffff;">
+          <h3 style="font-size: 1.05rem; display: flex; align-items: center; gap: 0.5rem; margin-top: 0; color: var(--color-secondary);">
+            <span>🏨</span> Hotel & Accommodation
+          </h3>
+          <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+            <button type="button" class="phrase-chip btn btn-ghost btn-sm" data-phrase="I have a reservation under my name.">I have a room reservation.</button>
+            <button type="button" class="phrase-chip btn btn-ghost btn-sm" data-phrase="Can I store my luggage here after check-out?">Can I store my bags here?</button>
+            <button type="button" class="phrase-chip btn btn-ghost btn-sm" data-phrase="Is breakfast included with the room?">Is breakfast included?</button>
+            <button type="button" class="phrase-chip btn btn-ghost btn-sm" data-phrase="What is the Wi-Fi password, please?">What is the Wi-Fi password?</button>
+            <button type="button" class="phrase-chip btn btn-ghost btn-sm" data-phrase="Could I request a late checkout?">Could I request a late check-out?</button>
+          </div>
+        </div>
+
+        <!-- Food & Dining -->
+        <div class="card" style="padding: 1.25rem; border: 1px solid var(--color-border); border-radius: var(--radius-lg); background: #ffffff;">
+          <h3 style="font-size: 1.05rem; display: flex; align-items: center; gap: 0.5rem; margin-top: 0; color: #d4a024;">
+            <span>🍽️</span> Food & Dining
+          </h3>
+          <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+            <button type="button" class="phrase-chip btn btn-ghost btn-sm" data-phrase="Could we have the bill, please?">The bill, please.</button>
+            <button type="button" class="phrase-chip btn btn-ghost btn-sm" data-phrase="Could I have bottled water, please?">Bottled water, please.</button>
+            <button type="button" class="phrase-chip btn btn-ghost btn-sm" data-phrase="Do you have vegetarian or vegan options?">Do you have vegetarian food?</button>
+            <button type="button" class="phrase-chip btn btn-ghost btn-sm" data-phrase="Is this dish spicy?">Is this dish spicy?</button>
+            <button type="button" class="phrase-chip btn btn-ghost btn-sm" data-phrase="What local specialty do you recommend?">What do you recommend?</button>
+          </div>
+        </div>
+
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-grid">
+      <div class="footer-brand">
+        <p><strong>TravelGuard AI</strong> — Smart Travel Problem Solver & Assistant.</p>
+      </div>
+      <ul class="footer-links">
+        <li><a href="dashboard.html">Dashboard</a></li>
+        <li><a href="assistant.html">Assistant</a></li>
+        <li><a href="emergency.html">Emergency</a></li>
+        <li><a href="routes.html">Routes</a></li>
+        <li><a href="translator.html">Translator</a></li>
+      </ul>
+    </div>
+  </footer>
+
+  <script src="js/main.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/translator.js"></script>
+</body>
+</html>

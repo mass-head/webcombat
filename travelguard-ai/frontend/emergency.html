@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Emergency Assistance — Find nearby hospitals, pharmacies, police, and consular help." />
+  <title>Emergency Assistance — TravelGuard AI</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/responsive.css" />
+  <link rel="stylesheet" href="css/dashboard.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to main content</a>
+  <header class="site-header">
+    <nav class="nav" aria-label="Main navigation">
+      <a class="logo" href="index.html" aria-label="TravelGuard AI home"><span>TravelGuard <strong>AI</strong></span></a>
+      <button class="nav-toggle" id="nav-toggle" type="button" aria-expanded="false" aria-controls="nav-links" aria-label="Open menu"><span></span><span></span><span></span></button>
+      <div class="nav-links" id="nav-links">
+        <a href="dashboard.html">Dashboard</a>
+        <a href="assistant.html">Assistant</a>
+        <a href="emergency.html" aria-current="page">Emergency</a>
+        <a href="routes.html">Routes</a>
+        <a href="translator.html">Translator</a>
+        <button class="btn btn-ghost btn-sm" type="button" data-logout>Logout</button>
+      </div>
+    </nav>
+  </header>
+
+  <main id="main" class="container page">
+    <div class="alert alert-error" id="auth-error" role="alert" hidden></div>
+
+    <!-- Emergency Header -->
+    <section class="emergency-header reveal" aria-labelledby="emergency-title">
+      <h1 id="emergency-title">Emergency Assistance</h1>
+      <p class="emergency-subtitle">Find nearby hospitals, pharmacies, police stations, and consular help. In a life-threatening emergency, call local emergency services immediately.</p>
+      <div class="emergency-banner" role="alert">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        <strong>If this is a life-threatening emergency, call <span id="local-emergency-number">112 / 911 / 999</span> now.</strong>
+      </div>
+    </section>
+
+    <!-- Location Status & Map -->
+    <section class="location-section reveal" aria-labelledby="location-heading">
+      <div class="section-header">
+        <div>
+          <h2 id="location-heading" class="section-title">Your Location</h2>
+          <p class="section-subtitle">Live map positioning and nearby emergency services.</p>
+        </div>
+        <button class="btn btn-primary btn-sm" type="button" id="refresh-location" aria-label="Detect GPS location">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" style="width:16px;height:16px;vertical-align:-2px;margin-right:4px;"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+          Detect My GPS
+        </button>
+      </div>
+
+      <div class="location-card">
+        <div class="location-status-bar">
+          <div class="location-indicator">
+            <span class="status-dot online" id="location-dot"></span>
+            <div>
+              <div class="location-headline" id="location-text">Detecting your location...</div>
+              <div class="location-coords-badge" id="location-coords">Locating via GPS & network...</div>
+            </div>
+          </div>
+          
+          <div class="location-search-wrap">
+            <input type="text" id="manual-location-input" class="location-search-input" placeholder="Search city (e.g. London, New York)..." aria-label="Search city or area">
+            <button class="btn btn-ghost btn-sm" type="button" id="manual-location-btn">Set Location</button>
+          </div>
+        </div>
+
+        <div class="location-chips" aria-label="Quick location selector">
+          <span class="chips-label">Quick Cities:</span>
+          <button type="button" class="chip-btn active" data-city="gps">📍 GPS Auto</button>
+          <button type="button" class="chip-btn" data-city="paris">🇫🇷 Paris</button>
+          <button type="button" class="chip-btn" data-city="london">🇬🇧 London</button>
+          <button type="button" class="chip-btn" data-city="newyork">🇺🇸 New York</button>
+          <button type="button" class="chip-btn" data-city="tokyo">🇯🇵 Tokyo</button>
+          <button type="button" class="chip-btn" data-city="mumbai">🇮🇳 Mumbai</button>
+        </div>
+
+        <!-- Interactive Map Container -->
+        <div class="location-map-container" id="location-map-container" style="position: relative;">
+          <div class="map-toolbar">
+            <span class="map-status-pill">📍 Live Map: Click anywhere or drag the pin to set your exact location</span>
+            <a id="open-external-map" class="map-external-link" href="https://www.google.com/maps" target="_blank" rel="noopener">Open in Google Maps ↗</a>
+          </div>
+          <div id="leaflet-map" style="height: 380px; width: 100%; border-radius: var(--radius-md); z-index: 1;"></div>
+          <iframe class="location-map-frame" id="location-map-frame" title="Live Emergency Map" src="about:blank" style="display:none;" loading="lazy"></iframe>
+        </div>
+
+        <p class="location-note" id="location-note">Showing emergency medical & safety facilities within a 5 km radius of your selected position.</p>
+      </div>
+    </section>
+
+    <!-- Emergency Categories -->
+    <section class="emergency-categories reveal" aria-labelledby="categories-heading">
+      <h2 id="categories-heading" class="section-title">Find Nearby Help</h2>
+      <div class="category-tabs" role="tablist" aria-label="Emergency service categories">
+        <button class="tab-btn active" role="tab" aria-selected="true" data-type="hospital" aria-controls="hospital-panel">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 2v20M17 12H7"/><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          <span>Hospitals</span>
+        </button>
+        <button class="tab-btn" role="tab" aria-selected="false" data-type="pharmacy" aria-controls="pharmacy-panel">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          <span>Pharmacies</span>
+        </button>
+        <button class="tab-btn" role="tab" aria-selected="false" data-type="police" aria-controls="police-panel">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M12 2v20M17 12H7"/></svg>
+          <span>Police</span>
+        </button>
+        <button class="tab-btn" role="tab" aria-selected="false" data-type="embassy" aria-controls="embassy-panel">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><path d="M12 6v6l4 2"/></svg>
+          <span>Embassies</span>
+        </button>
+        <button class="tab-btn" role="tab" aria-selected="false" data-type="hotel" aria-controls="hotel-panel">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 21h18M3 10h18M5 6l7-3 7 3M4 10v11M20 10v11M8 14v3M12 14v3M16 14v3"/></svg>
+          <span>Hotels</span>
+        </button>
+        <button class="tab-btn" role="tab" aria-selected="false" data-type="mall" aria-controls="mall-panel">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+          <span>Malls</span>
+        </button>
+        <button class="tab-btn" role="tab" aria-selected="false" data-type="cinema" aria-controls="cinema-panel">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"/><line x1="7" y1="2" x2="7" y2="22"/><line x1="17" y1="2" x2="17" y2="22"/><line x1="2" y1="12" x2="22" y2="12"/><line x1="2" y1="7" x2="7" y2="7"/><line x1="2" y1="17" x2="7" y2="17"/><line x1="17" y1="17" x2="22" y2="17"/><line x1="17" y1="7" x2="22" y2="7"/></svg>
+          <span>Theaters</span>
+        </button>
+        <button class="tab-btn" role="tab" aria-selected="false" data-type="attraction" aria-controls="attraction-panel">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          <span>Famous Places</span>
+        </button>
+        <button class="tab-btn" role="tab" aria-selected="false" data-type="rental" aria-controls="rental-panel">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+          <span>Rental Vehicles</span>
+        </button>
+      </div>
+
+      <!-- Category Panels -->
+      <div class="tab-panels">
+        <div class="tab-panel active" id="hospital-panel" role="tabpanel" aria-labelledby="hospital-tab">
+          <div class="places-list" id="hospital-list" role="list">
+            <div class="loading-state" id="hospital-loading">
+              <div class="spinner"></div>
+              <p>Loading hospitals...</p>
+            </div>
+          </div>
+        </div>
+        <div class="tab-panel" id="pharmacy-panel" role="tabpanel" aria-labelledby="pharmacy-tab">
+          <div class="places-list" id="pharmacy-list" role="list">
+            <div class="loading-state" id="pharmacy-loading">
+              <div class="spinner"></div>
+              <p>Loading pharmacies...</p>
+            </div>
+          </div>
+        </div>
+        <div class="tab-panel" id="police-panel" role="tabpanel" aria-labelledby="police-tab">
+          <div class="places-list" id="police-list" role="list">
+            <div class="loading-state" id="police-loading">
+              <div class="spinner"></div>
+              <p>Loading police stations...</p>
+            </div>
+          </div>
+        </div>
+        <div class="tab-panel" id="embassy-panel" role="tabpanel" aria-labelledby="embassy-tab">
+          <div class="places-list" id="embassy-list" role="list">
+            <div class="loading-state" id="embassy-loading">
+              <div class="spinner"></div>
+              <p>Loading embassies...</p>
+            </div>
+          </div>
+        </div>
+        <div class="tab-panel" id="hotel-panel" role="tabpanel" aria-labelledby="hotel-tab">
+          <div class="places-list" id="hotel-list" role="list">
+            <div class="loading-state" id="hotel-loading">
+              <div class="spinner"></div>
+              <p>Loading hotels...</p>
+            </div>
+          </div>
+        </div>
+        <div class="tab-panel" id="mall-panel" role="tabpanel" aria-labelledby="mall-tab">
+          <div class="places-list" id="mall-list" role="list">
+            <div class="loading-state" id="mall-loading">
+              <div class="spinner"></div>
+              <p>Loading shopping malls...</p>
+            </div>
+          </div>
+        </div>
+        <div class="tab-panel" id="cinema-panel" role="tabpanel" aria-labelledby="cinema-tab">
+          <div class="places-list" id="cinema-list" role="list">
+            <div class="loading-state" id="cinema-loading">
+              <div class="spinner"></div>
+              <p>Loading movie theaters...</p>
+            </div>
+          </div>
+        </div>
+        <div class="tab-panel" id="attraction-panel" role="tabpanel" aria-labelledby="attraction-tab">
+          <div class="places-list" id="attraction-list" role="list">
+            <div class="loading-state" id="attraction-loading">
+              <div class="spinner"></div>
+              <p>Loading famous places & attractions...</p>
+            </div>
+          </div>
+        </div>
+        <div class="tab-panel" id="rental-panel" role="tabpanel" aria-labelledby="rental-tab">
+          <div class="places-list" id="rental-list" role="list">
+            <div class="loading-state" id="rental-loading">
+              <div class="spinner"></div>
+              <p>Loading vehicle rental desks...</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Emergency Numbers -->
+    <section class="emergency-numbers reveal" aria-labelledby="numbers-heading">
+      <h2 id="numbers-heading" class="section-title">Emergency Numbers</h2>
+      <div class="country-selector">
+        <label for="country-select">Select your country:</label>
+        <select id="country-select" aria-label="Country for emergency numbers">
+          <option value="default">Universal / Other (112)</option>
+        </select>
+      </div>
+      <div class="numbers-grid" id="numbers-grid" role="list">
+        <!-- Populated by JS -->
+      </div>
+    </section>
+
+    <!-- Safety Guidance -->
+    <section class="safety-guidance reveal" aria-labelledby="safety-heading">
+      <h2 id="safety-heading" class="section-title">Safety Guidance</h2>
+      <div class="guidance-grid">
+        <article class="guidance-card">
+          <h3>Medical Emergency</h3>
+          <ul>
+            <li>Call emergency services immediately</li>
+            <li>Do not move injured person unless in danger</li>
+            <li>Carry ID, insurance, and medication list</li>
+            <li>Ask for English-speaking staff if needed</li>
+          </ul>
+        </article>
+        <article class="guidance-card">
+          <h3>Lost Documents</h3>
+          <ul>
+            <li>Report to local police immediately</li>
+            <li>Contact your embassy/consulate</li>
+            <li>Get a police report for insurance</li>
+            <li>Keep digital copies of documents</li>
+          </ul>
+        </article>
+        <article class="guidance-card">
+          <h3>Safety Concern</h3>
+          <ul>
+            <li>Trust your instincts — leave unsafe areas</li>
+            <li>Share location with trusted contacts</li>
+            <li>Know your embassy's emergency contact</li>
+            <li>Register with your country's travel program</li>
+          </ul>
+        </article>
+        <article class="guidance-card">
+          <h3>Travel Insurance</h3>
+          <ul>
+            <li>Contact insurer before treatment if possible</li>
+            <li>Keep all receipts and medical reports</li>
+            <li>Know your policy's emergency number</li>
+            <li>Check coverage for medical evacuation</li>
+          </ul>
+        </article>
+      </div>
+    </section>
+
+    <!-- Trusted Contacts -->
+    <section class="trusted-contacts reveal" aria-labelledby="contacts-heading">
+      <div class="contacts-header-wrap">
+        <div>
+          <h2 id="contacts-heading" class="section-title">Trusted Contacts</h2>
+          <p class="section-subtitle">Add emergency contacts who can be notified if you need help.</p>
+        </div>
+        <button class="btn btn-primary" type="button" id="header-add-contact-btn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 16px; height: 16px; margin-right: 6px;" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+          Add Contact
+        </button>
+      </div>
+      <div class="contacts-list" id="contacts-list">
+        <div class="empty-state" id="empty-contacts">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          <h3>No trusted contacts added</h3>
+          <p>Add contacts who should be notified in an emergency.</p>
+          <button class="btn btn-primary" type="button" id="add-contact-btn">Add Contact</button>
+        </div>
+      </div>
+      <div class="contact-form hidden" id="contact-form" hidden>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+          <h3 id="contact-form-title" style="margin: 0;">Add Contact</h3>
+          <button type="button" class="btn btn-ghost btn-sm" id="close-contact-icon-btn" aria-label="Close form" style="padding: 0.25rem 0.6rem; font-size: 1.1rem; line-height: 1;">✕</button>
+        </div>
+        <form id="contact-form-inner">
+          <div class="field">
+            <label for="contact-name">Name *</label>
+            <input type="text" id="contact-name" required placeholder="e.g. John Doe" maxlength="100">
+          </div>
+          <div class="field">
+            <label for="contact-phone">Phone *</label>
+            <input type="tel" id="contact-phone" required placeholder="e.g. +1 555 123 4567" maxlength="30">
+          </div>
+          <div class="field">
+            <label for="contact-email">Email (optional)</label>
+            <input type="email" id="contact-email" placeholder="e.g. john@example.com" maxlength="100">
+          </div>
+          <div class="field">
+            <label for="contact-relationship">Relationship</label>
+            <select id="contact-relationship">
+              <option value="Family">Family</option>
+              <option value="Spouse / Partner">Spouse / Partner</option>
+              <option value="Friend">Friend</option>
+              <option value="Doctor">Doctor</option>
+              <option value="Colleague">Colleague</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+          <div class="form-actions">
+            <button type="button" class="btn btn-ghost" id="cancel-contact">Cancel</button>
+            <button type="submit" class="btn btn-primary">Save Contact</button>
+          </div>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-grid">
+      <div class="footer-brand"><span class="logo-static">TravelGuard <strong>AI</strong></span></div>
+      <nav aria-label="Footer navigation"><ul class="footer-links"><li><a href="about.html">About</a></li><li><a href="privacy.html">Privacy</a></li><li><a href="contact.html">Contact</a></li></ul></nav>
+    </div>
+    <p class="copyright">&copy; <span id="year">2026</span> TravelGuard AI. All rights reserved.</p>
+  </footer>
+
+  <script src="js/main.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="js/emergency.js"></script>
+</body>
+</html>

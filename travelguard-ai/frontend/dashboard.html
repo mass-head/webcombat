@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Your TravelGuard AI dashboard — personalized travel assistance." />
+  <title>Dashboard — TravelGuard AI</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/responsive.css" />
+  <link rel="stylesheet" href="css/dashboard.css" />
+</head>
+<body data-require-auth>
+  <a class="skip-link" href="#main">Skip to main content</a>
+  <header class="site-header">
+    <nav class="nav" aria-label="Main navigation">
+      <a class="logo" href="index.html" aria-label="TravelGuard AI home"><span>TravelGuard <strong>AI</strong></span></a>
+      <button class="nav-toggle" id="nav-toggle" type="button" aria-expanded="false" aria-controls="nav-links" aria-label="Open menu"><span></span><span></span><span></span></button>
+      <div class="nav-links" id="nav-links">
+        <a href="dashboard.html" aria-current="page">Dashboard</a>
+        <a href="assistant.html">Assistant</a>
+        <a href="emergency.html">Emergency</a>
+        <a href="routes.html">Routes</a>
+        <a href="translator.html">Translator</a>
+        <button class="btn btn-ghost btn-sm" type="button" data-logout>Logout</button>
+      </div>
+    </nav>
+  </header>
+
+  <main id="main" class="container page">
+    <div class="alert alert-error" id="auth-error" role="alert" hidden></div>
+
+    <!-- Welcome Section -->
+    <section class="welcome-section reveal" aria-labelledby="welcome-heading">
+      <h1 id="welcome-heading">Welcome back, <span data-username>traveler</span>.</h1>
+      <p class="welcome-subtitle">Ready to handle any travel challenge that comes your way.</p>
+      <button class="btn btn-primary btn-lg quick-assist-btn" type="button" data-action="quick-assist">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg>
+        Quick Assistance
+      </button>
+    </section>
+
+    <!-- Quick Access Cards -->
+    <section class="cards-section reveal" aria-labelledby="quick-access-heading">
+      <h2 id="quick-access-heading" class="section-title">Quick Access</h2>
+      <div class="card-grid">
+        <article class="card feature-card" data-action="assistant">
+          <div class="card-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><path d="M12 7v6"/><path d="M12 16h.01"/></svg>
+          </div>
+          <h3>AI Travel Assistant</h3>
+          <p>Chat with our AI for step-by-step guidance on any travel problem — missed connections, lost luggage, booking issues, and more.</p>
+          <button class="btn btn-primary btn-sm" type="button">Open Assistant</button>
+        </article>
+
+        <article class="card feature-card" data-action="emergency">
+          <div class="card-icon emergency" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 12H7"/><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          </div>
+          <h3>Emergency Help</h3>
+          <p>Find nearby hospitals, pharmacies, police stations, and official assistance centers with one tap.</p>
+          <button class="btn btn-primary btn-sm" type="button">Open Emergency</button>
+        </article>
+
+        <article class="card feature-card" data-action="routes">
+          <div class="card-icon routes" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+          </div>
+          <h3>Alternative Routes</h3>
+          <p>Discover alternative transport options, compare routes, and find the best way to reach your destination.</p>
+          <button class="btn btn-primary btn-sm" type="button">Open Routes</button>
+        </article>
+
+        <article class="card feature-card" data-action="translator">
+          <div class="card-icon" style="background: var(--c-cream); color: var(--color-primary); border: 1px solid var(--c-gold);" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+          </div>
+          <h3>Language Translator</h3>
+          <p>Translate speech and phrases across 50+ languages with phonetic pronunciation guides and offline phrase shortcuts.</p>
+          <a class="btn btn-primary btn-sm" href="translator.html" style="text-decoration: none;">Open Translator</a>
+        </article>
+      </div>
+    </section>
+
+    <!-- Common Travel Problems -->
+    <section class="problems-section reveal" aria-labelledby="problems-heading">
+      <h2 id="problems-heading" class="section-title">Common Travel Problems</h2>
+      <p class="section-subtitle">Select a category to get targeted assistance</p>
+      <div class="problem-grid" id="problem-grid" role="list">
+        <!-- Problem cards will be rendered by JavaScript -->
+      </div>
+    </section>
+
+    <!-- Saved Travel Plans -->
+    <section class="saved-section reveal" aria-labelledby="saved-heading">
+      <div class="section-header">
+        <h2 id="saved-heading" class="section-title">Saved Travel Plans</h2>
+        <button class="btn btn-ghost btn-sm" type="button" data-action="new-plan">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          New Plan
+        </button>
+      </div>
+      <div class="plans-list" id="plans-list" role="list">
+        <div class="empty-state" id="empty-plans">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          <h3>No saved plans yet</h3>
+          <p>Create your first travel plan to keep track of trips and get personalized assistance.</p>
+          <button class="btn btn-primary" type="button" data-action="new-plan">Create Travel Plan</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Recent Assistance History -->
+    <section class="history-section reveal" aria-labelledby="history-heading">
+      <div class="section-header">
+        <h2 id="history-heading" class="section-title">Recent Assistance History</h2>
+        <button class="btn btn-ghost btn-sm" type="button" data-action="clear-history">Clear History</button>
+      </div>
+      <div class="history-list" id="history-list" role="list">
+        <div class="empty-state" id="empty-history">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          <h3>No recent activity</h3>
+          <p>Your assistance history will appear here after you use the AI Assistant, Emergency Help, or Route Finder.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-grid">
+      <div class="footer-brand"><span class="logo-static">TravelGuard <strong>AI</strong></span></div>
+      <nav aria-label="Footer navigation"><ul class="footer-links"><li><a href="about.html">About</a></li><li><a href="privacy.html">Privacy</a></li><li><a href="contact.html">Contact</a></li></ul></nav>
+    </div>
+    <p class="copyright">&copy; <span id="year">2026</span> TravelGuard AI. All rights reserved.</p>
+  </footer>
+
+  <script src="js/main.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/dashboard.js"></script>
+</body>
+</html>

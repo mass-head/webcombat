@@ -1,0 +1,10 @@
+# Never ship secrets or local state in the image
+**/.env
+**/__pycache__
+**/*.py[cod]
+**/*.db
+**/*.sqlite*
+.venv/
+venv/
+.git/
+instance/

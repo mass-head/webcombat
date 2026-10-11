@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="AI Travel Assistant — Get help with travel problems instantly." />
+  <title>AI Travel Assistant — TravelGuard AI</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/responsive.css" />
+  <link rel="stylesheet" href="css/dashboard.css" />
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to main content</a>
+  <header class="site-header">
+    <nav class="nav" aria-label="Main navigation">
+      <a class="logo" href="index.html" aria-label="TravelGuard AI home"><span>TravelGuard <strong>AI</strong></span></a>
+      <button class="nav-toggle" id="nav-toggle" type="button" aria-expanded="false" aria-controls="nav-links" aria-label="Open menu"><span></span><span></span><span></span></button>
+      <div class="nav-links" id="nav-links">
+        <a href="dashboard.html">Dashboard</a>
+        <a href="assistant.html" aria-current="page">Assistant</a>
+        <a href="emergency.html">Emergency</a>
+        <a href="routes.html">Routes</a>
+        <a href="translator.html">Translator</a>
+        <button class="btn btn-ghost btn-sm" type="button" data-logout>Logout</button>
+      </div>
+    </nav>
+  </header>
+
+  <main id="main" class="container page">
+    <div class="alert alert-error" id="auth-error" role="alert" hidden></div>
+
+    <!-- Assistant Header -->
+    <section class="assistant-header reveal" aria-labelledby="assistant-title">
+      <h1 id="assistant-title">AI Travel Assistant</h1>
+      <p class="assistant-subtitle">Describe your travel problem — I'll give you step-by-step guidance.</p>
+      <div class="assistant-status" id="assistant-status" aria-live="polite">
+        <span class="status-dot" id="api-status-dot"></span>
+        <span class="status-text" id="api-status-text">Checking AI service...</span>
+      </div>
+    </section>
+
+    <!-- Suggested Questions -->
+    <section class="suggestions-section reveal" aria-labelledby="suggestions-heading">
+      <h2 id="suggestions-heading" class="section-title">Common Questions</h2>
+      <div class="suggestions-grid" id="suggestions-grid" role="list">
+        <!-- Rendered by JS -->
+      </div>
+    </section>
+
+    <!-- Missed Transit & Emergency Cost Budget Estimator Tool -->
+    <section class="budget-estimator-section reveal" aria-labelledby="budget-estimator-heading" style="margin-bottom: 1.25rem;">
+      <div class="card" style="background: #ffffff; border: 1.5px solid var(--c-gold); border-radius: var(--radius-xl); box-shadow: var(--shadow-md); padding: 1.25rem 1.5rem;">
+        <div style="display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; margin-bottom: 1rem;">
+          <div style="display: flex; align-items: center; gap: 0.75rem;">
+            <div style="width: 42px; height: 42px; border-radius: 10px; background: rgba(233, 196, 106, 0.25); border: 1px solid var(--c-gold); display: flex; align-items: center; justify-content: center; font-size: 1.35rem;">
+              🚆
+            </div>
+            <div>
+              <h2 id="budget-estimator-heading" style="font-size: 1.15rem; font-weight: 750; color: var(--color-primary); margin: 0;">
+                Missed Transit & Emergency Cost Budget Estimator
+              </h2>
+              <p style="font-size: 0.85rem; color: var(--color-secondary); margin: 0.15rem 0 0;">
+                Instant alternatives, cost comparison table, and AI action plan for missed trains, flights, or buses.
+              </p>
+            </div>
+          </div>
+          <button type="button" class="btn btn-ghost btn-sm" id="toggle-estimator-btn" style="font-size: 0.82rem; font-weight: 600; padding: 0.3rem 0.75rem;">
+            Hide Tool ▾
+          </button>
+        </div>
+
+        <div id="estimator-body">
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 1rem;">
+            <div>
+              <label for="transit-type" style="display: block; font-size: 0.82rem; font-weight: 650; color: var(--color-text); margin-bottom: 0.35rem;">Disrupted Transit</label>
+              <select id="transit-type" class="form-select" style="width: 100%; padding: 0.55rem 0.75rem; border: 1px solid var(--color-border); border-radius: var(--radius-md); font-size: 0.88rem; background: var(--c-cream);">
+                <option value="Missed Train" selected>🚆 Missed Train</option>
+                <option value="Cancelled Train">🛑 Cancelled Train</option>
+                <option value="Missed Flight">✈️ Missed Flight</option>
+                <option value="Missed Bus">🚌 Missed Intercity Bus</option>
+              </select>
+            </div>
+            <div>
+              <label for="transit-origin" style="display: block; font-size: 0.82rem; font-weight: 650; color: var(--color-text); margin-bottom: 0.35rem;">Current Station / Origin</label>
+              <input type="text" id="transit-origin" class="form-input" placeholder="e.g., New Delhi Railway Station" value="New Delhi Railway Station" style="width: 100%; padding: 0.55rem 0.75rem; border: 1px solid var(--color-border); border-radius: var(--radius-md); font-size: 0.88rem; background: #fff;" />
+            </div>
+            <div>
+              <label for="transit-destination" style="display: block; font-size: 0.82rem; font-weight: 650; color: var(--color-text); margin-bottom: 0.35rem;">Destination</label>
+              <input type="text" id="transit-destination" class="form-input" placeholder="e.g., Jaipur / Mumbai / Agra" value="Jaipur Junction" style="width: 100%; padding: 0.55rem 0.75rem; border: 1px solid var(--color-border); border-radius: var(--radius-md); font-size: 0.88rem; background: #fff;" />
+            </div>
+            <div>
+              <label for="transit-priority" style="display: block; font-size: 0.82rem; font-weight: 650; color: var(--color-text); margin-bottom: 0.35rem;">Urgency & Priority</label>
+              <select id="transit-priority" class="form-select" style="width: 100%; padding: 0.55rem 0.75rem; border: 1px solid var(--color-border); border-radius: var(--radius-md); font-size: 0.88rem; background: var(--c-cream);">
+                <option value="Fastest / Urgent Arrival" selected>⚡ Urgent / Fastest Arrival</option>
+                <option value="Most Economical Budget">💰 Budget-Friendly (Lowest Cost)</option>
+                <option value="Safe Overnight Stay">🏨 Overnight Rest & Morning Train</option>
+              </select>
+            </div>
+          </div>
+
+          <div style="display: flex; gap: 0.75rem; flex-wrap: wrap; margin-bottom: 0.5rem;">
+            <button type="button" class="btn btn-primary btn-sm" id="calc-estimate-btn" style="padding: 0.55rem 1.15rem; font-weight: 650;">
+              📊 Calculate Cost & Alternatives
+            </button>
+            <button type="button" class="btn btn-ghost btn-sm" id="ask-ai-plan-btn" style="padding: 0.55rem 1.15rem; font-weight: 650; border: 1px solid var(--c-forest); color: var(--c-forest);">
+              🤖 Ask AI Assistant for Custom Plan
+            </button>
+          </div>
+
+          <!-- Dynamic Output Card -->
+          <div id="estimator-output" class="hidden" style="background: var(--c-cream); border: 1px solid var(--c-gold); border-radius: var(--radius-lg); padding: 1.1rem; margin-top: 0.85rem;">
+            <!-- Rendered by JS -->
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Chat Interface -->
+    <section class="chat-section reveal" aria-labelledby="chat-heading">
+      <!-- Chat Location Bar -->
+      <div class="chat-location-bar" id="chat-location-bar" style="display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 0.65rem 1rem; background: #ffffff; border: 1px solid var(--color-border); border-radius: var(--radius-lg); margin-bottom: 0.75rem; box-shadow: var(--shadow-sm); flex-wrap: wrap;">
+        <div style="display: flex; align-items: center; gap: 0.6rem;">
+          <span class="status-dot online" id="chat-location-dot" style="width: 10px; height: 10px; background: #285943; box-shadow: 0 0 8px rgba(40, 89, 67, 0.5);"></span>
+          <span style="font-size: 0.88rem; font-weight: 600; color: var(--color-text);">📍 Current Location:</span>
+          <span id="chat-location-text" style="font-size: 0.88rem; font-weight: 500; color: var(--color-secondary);">Detecting location...</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 0.5rem;">
+          <span id="chat-location-badge" style="display: inline-block; padding: 0.18rem 0.55rem; background: var(--c-cream); border: 1px solid var(--c-gold); color: var(--color-text); border-radius: 999px; font-size: 0.75rem; font-weight: 600;">Location-Aware AI Active</span>
+          <button type="button" class="btn btn-ghost btn-sm" id="chat-refresh-location-btn" style="padding: 0.25rem 0.65rem; font-size: 0.78rem;">Update GPS ⟳</button>
+        </div>
+      </div>
+
+      <div class="chat-container" role="log" aria-live="polite" aria-label="Conversation">
+        <div class="chat-messages" id="chat-messages">
+          <div class="message assistant welcome-message" id="welcome-message">
+            <div class="message-avatar" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg>
+            </div>
+            <div class="message-content">
+              <p>Hello! I'm your AI Travel Assistant. How can I help you today?</p>
+              <div class="message-time">Just now</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Loading Indicator -->
+        <div class="message assistant loading-message hidden" id="loading-message" aria-hidden="true">
+          <div class="message-avatar" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg>
+          </div>
+          <div class="message-content">
+            <div class="typing-indicator" aria-label="AI is typing">
+              <span></span><span></span><span></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Error Message -->
+        <div class="message error-message hidden" id="error-message" role="alert">
+          <div class="message-content error">
+            <p id="error-text"></p>
+            <button class="btn btn-ghost btn-sm" type="button" id="retry-btn">Retry</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Input Area -->
+      <form class="chat-input-form" id="chat-form" autocomplete="off" onsubmit="event.preventDefault(); return false;">
+        <div class="input-wrapper">
+          <textarea
+            id="chat-input"
+            class="chat-input"
+            placeholder="Type your travel problem here... (e.g., 'I missed my train in Paris')"
+            rows="1"
+            aria-label="Your message"
+            maxlength="4000"
+          ></textarea>
+          <button type="button" class="input-action" id="attach-btn" aria-label="Attach files" title="Attach files">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.44 11.05a1 1 0 0 1 0 1.9l-5.66 5.66a1 1 0 0 1-1.42 0l-5.66-5.66a1 1 0 0 1 0-1.9l5.66-5.66a1 1 0 0 1 1.42 0z"/><path d="M12 2v14"/><path d="M8 16h8"/></svg>
+          </button>
+        </div>
+        <div class="input-actions">
+          <button type="button" class="btn btn-primary send-btn" id="send-btn" aria-label="Send message">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+            <span class="btn-text">Send</span>
+          </button>
+        </div>
+      </form>
+
+      <!-- Footer Actions -->
+      <div class="chat-footer">
+        <button type="button" class="btn btn-ghost btn-sm" id="clear-chat-btn" aria-label="Clear conversation">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+          Clear Conversation
+        </button>
+        <span class="demo-badge" id="demo-badge" hidden>Demo Mode — Configure GEMINI_API_KEY for real AI</span>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-grid">
+      <div class="footer-brand"><span class="logo-static">TravelGuard <strong>AI</strong></span></div>
+      <nav aria-label="Footer navigation"><ul class="footer-links"><li><a href="about.html">About</a></li><li><a href="privacy.html">Privacy</a></li><li><a href="contact.html">Contact</a></li></ul></nav>
+    </div>
+    <p class="copyright">&copy; <span id="year">2026</span> TravelGuard AI. All rights reserved.</p>
+  </footer>
+
+  <script src="js/main.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/assistant.js"></script>
+</body>
+</html>

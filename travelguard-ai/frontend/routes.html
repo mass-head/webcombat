@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Alternative Routes & Weather — Find the best way to reach your destination." />
+  <title>Alternative Routes — TravelGuard AI</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/responsive.css" />
+  <link rel="stylesheet" href="css/dashboard.css" />
+</head>
+<body data-require-auth>
+  <a class="skip-link" href="#main">Skip to main content</a>
+  <header class="site-header">
+    <nav class="nav" aria-label="Main navigation">
+      <a class="logo" href="index.html" aria-label="TravelGuard AI home"><span>TravelGuard <strong>AI</strong></span></a>
+      <button class="nav-toggle" id="nav-toggle" type="button" aria-expanded="false" aria-controls="nav-links" aria-label="Open menu"><span></span><span></span><span></span></button>
+      <div class="nav-links" id="nav-links">
+        <a href="dashboard.html">Dashboard</a>
+        <a href="assistant.html">Assistant</a>
+        <a href="emergency.html">Emergency</a>
+        <a href="routes.html" aria-current="page">Routes</a>
+        <a href="translator.html">Translator</a>
+        <button class="btn btn-ghost btn-sm" type="button" data-logout>Logout</button>
+      </div>
+    </nav>
+  </header>
+
+  <main id="main" class="container page">
+    <div class="alert alert-error" id="auth-error" role="alert" hidden></div>
+
+    <!-- Route Finder Header -->
+    <section class="routes-header reveal" aria-labelledby="routes-title">
+      <h1 id="routes-title">Alternative Routes & Weather</h1>
+      <p class="routes-subtitle">Enter your trip details to see transport options, estimated costs, and weather forecast.</p>
+    </section>
+
+    <!-- Route Form -->
+    <section class="route-form-section reveal" aria-labelledby="form-heading">
+      <h2 id="form-heading" class="section-title">Plan Your Route</h2>
+      <div class="popular-routes-chips" style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1.25rem; align-items: center;">
+        <span style="font-size: 0.85rem; font-weight: 700; color: var(--color-primary-dark);">Quick Trips:</span>
+        <button type="button" class="chip-btn" data-from="Delhi, India" data-to="Jaipur, India">🇮🇳 Delhi → Jaipur</button>
+        <button type="button" class="chip-btn" data-from="Mumbai, India" data-to="Goa, India">🇮🇳 Mumbai → Goa</button>
+        <button type="button" class="chip-btn" data-from="Bangalore, India" data-to="Chennai, India">🇮🇳 Bangalore → Chennai</button>
+        <button type="button" class="chip-btn" data-from="New York, USA" data-to="Boston, USA">🇺🇸 New York → Boston</button>
+        <button type="button" class="chip-btn" data-from="London, UK" data-to="Paris, France">🇪🇺 London → Paris</button>
+      </div>
+      <form class="route-form" id="route-form" autocomplete="off">
+        <div class="form-row">
+          <div class="field">
+            <label for="origin">Starting Location <span class="required" aria-hidden="true">*</span></label>
+            <input type="text" id="origin" name="origin" required placeholder="e.g., New York, NY" maxlength="128" aria-describedby="origin-hint">
+            <span class="form-hint" id="origin-hint">City, address, or landmark</span>
+          </div>
+          <div class="field">
+            <label for="destination">Destination <span class="required" aria-hidden="true">*</span></label>
+            <input type="text" id="destination" name="destination" required placeholder="e.g., London, UK" maxlength="128" aria-describedby="dest-hint">
+            <span class="form-hint" id="dest-hint">City, address, or landmark</span>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="field">
+            <label for="travel-date">Travel Date</label>
+            <input type="date" id="travel-date" name="travel_date" aria-describedby="date-hint">
+            <span class="form-hint" id="date-hint">Optional — for weather forecast</span>
+          </div>
+          <div class="field">
+            <label for="transport">Preferred Transport</label>
+            <select id="transport" name="transport" aria-describedby="transport-hint">
+              <option value="">Any / Show all options</option>
+              <option value="flight">✈️ Flight</option>
+              <option value="train">🚂 Train</option>
+              <option value="bus">🚌 Bus</option>
+              <option value="car">🚗 Car</option>
+              <option value="ferry">⛴️ Ferry</option>
+            </select>
+            <span class="form-hint" id="transport-hint">Optional — prioritizes this mode</span>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="field">
+            <label for="budget">Maximum Budget (USD)</label>
+            <input type="number" id="budget" name="budget" min="0" step="10" placeholder="e.g., 500" aria-describedby="budget-hint">
+            <span class="form-hint" id="budget-hint">Optional — flags options over budget</span>
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary" id="find-routes-btn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+            <span>Find Routes</span>
+          </button>
+          <button type="button" class="btn btn-ghost" id="clear-form-btn">Clear</button>
+        </div>
+      </form>
+    </section>
+
+    <!-- Loading State -->
+    <div class="loading-overlay hidden" id="loading-overlay" role="status" aria-live="polite">
+      <div class="loading-content">
+        <div class="spinner-large"></div>
+        <p>Finding routes and checking weather...</p>
+        <p class="loading-hint">This may take a few seconds</p>
+      </div>
+    </div>
+
+    <!-- Error Display -->
+    <div class="alert alert-error hidden" id="route-error" role="alert"></div>
+
+    <!-- Results Section -->
+    <section class="results-section hidden" id="results-section" aria-labelledby="results-heading">
+      <div class="results-header">
+        <h2 id="results-heading" class="section-title">Route Options</h2>
+        <div class="route-summary" id="route-summary"></div>
+      </div>
+
+      <!-- Interactive Route Map Preview -->
+      <div class="route-map-card" id="route-map-card" style="margin-bottom: 1.5rem; background: #ffffff; border: 1px solid var(--color-border); border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow-sm);" hidden>
+        <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 1.25rem; background: var(--color-bg); border-bottom: 1px solid var(--color-border);">
+          <span style="font-size: 0.88rem; font-weight: 700; color: var(--color-primary-dark);">📍 Route Destination Map</span>
+          <a id="open-route-gmaps" href="#" target="_blank" rel="noopener" style="font-size: 0.84rem; font-weight: 600; color: var(--color-secondary);">Open Directions in Google Maps ↗</a>
+        </div>
+        <iframe id="route-map-frame" title="Route overview map" style="width: 100%; height: 260px; border: none; display: block;" loading="lazy"></iframe>
+      </div>
+
+      <!-- Weather Card -->
+      <div class="weather-card" id="weather-card" hidden>
+        <div class="weather-header">
+          <h3>Weather Forecast</h3>
+          <span class="weather-source" id="weather-source"></span>
+        </div>
+        <div class="weather-content" id="weather-content"></div>
+      </div>
+
+      <!-- Route Cards -->
+      <div class="routes-grid" id="routes-grid" role="list">
+        <!-- Populated by JS -->
+      </div>
+
+      <!-- No Results -->
+      <div class="empty-state hidden" id="no-routes">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+        <h3>No routes found</h3>
+        <p>Try adjusting your search criteria or check the location names.</p>
+      </div>
+    </section>
+
+    <!-- Saved Alternatives -->
+    <section class="saved-alternatives reveal" aria-labelledby="saved-alt-heading">
+      <div class="section-header">
+        <h2 id="saved-alt-heading" class="section-title">Saved Alternatives</h2>
+      </div>
+      <div class="alternatives-list" id="alternatives-list" role="list">
+        <div class="empty-state" id="empty-alternatives">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M19 21l-7-7 7-7"/><path d="M3 12h16"/></svg>
+          <h3>No saved alternatives</h3>
+          <p>Save your preferred routes from the results above to access them later.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-grid">
+      <div class="footer-brand"><span class="logo-static">TravelGuard <strong>AI</strong></span></div>
+      <nav aria-label="Footer navigation"><ul class="footer-links"><li><a href="about.html">About</a></li><li><a href="privacy.html">Privacy</a></li><li><a href="contact.html">Contact</a></li></ul></nav>
+    </div>
+    <p class="copyright">&copy; <span id="year">2026</span> TravelGuard AI. All rights reserved.</p>
+  </footer>
+
+  <script src="js/main.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/routes.js"></script>
+</body>
+</html>
